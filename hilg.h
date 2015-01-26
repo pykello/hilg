@@ -33,4 +33,6 @@ struct hilg_state {
 extern struct hilg_state * hilg_init(struct hilg_game_info *game_info);
 extern void hilg_run(struct hilg_state *state);
 
+#define hilg_init_and_run(game_info_ptr) hilg_run(hilg_init(game_info_ptr))
+
 #endif

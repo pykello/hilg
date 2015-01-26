@@ -23,8 +23,6 @@ static int bmover_is_done(void *state);
 int main(int argc, char *argv[])
 {
 	struct hilg_game_info game_info;
-	struct hilg_state *hilg_token = NULL;
-
 	struct bmover_state game_state = {
 		.done = 0,
 		.current_row = 1,
@@ -43,8 +41,7 @@ int main(int argc, char *argv[])
 		.is_done_func = bmover_is_done
 	};
 
-	hilg_token = hilg_init(&game_info);
-	hilg_run(hilg_token);
+	hilg_init_and_run(&game_info);
 
 	return 0;
 }
@@ -53,8 +50,6 @@ int main(int argc, char *argv[])
 static void bmover_handle_event(void *gstate, struct hilg_event *event)
 {
 	struct bmover_state *state = gstate;
-	int delta_row = 0;
-	int delta_col = 0;
 
 	if (event->type != KEYPRESS)
 		return;
@@ -65,33 +60,21 @@ static void bmover_handle_event(void *gstate, struct hilg_event *event)
 		state->done = 1;
 		break;
 	case KEY_UP:
-		delta_row = -1;
-		delta_col = 0;
+		if (state->current_row > 1)
+			state->current_row--;
 		break;
 	case KEY_DOWN:
-		delta_row = 1;
-		delta_col = 0;
+		if (state->current_row < state->row_count - 2)
+			state->current_row++;
 		break;
 	case KEY_LEFT:
-		delta_row = 0;
-		delta_col = -1;
+		if (state->current_col > 1)
+			state->current_col--;
 		break;
 	case KEY_RIGHT:
-		delta_row = 0;
-		delta_col = 1;
+		if (state->current_col < state->col_count - 2)
+			state->current_col++;
 		break;
-	}
-
-	if (delta_row != 0 || delta_col != 0) {
-		int new_row = state->current_row + delta_row;
-		int new_col = state->current_col + delta_col;
-
-		if (new_row > 0 && new_row < state->row_count - 1 &&
-		    new_col > 0 && new_col < state->col_count - 1) {
-
-			state->current_row = new_row;
-			state->current_col = new_col;
-		}
 	}
 }
 
