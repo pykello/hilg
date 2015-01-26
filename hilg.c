@@ -5,7 +5,6 @@
 
 #include <hilg.h>
 
-
 struct hilg_state * hilg_init(struct hilg_game_info *game_info)
 {
 	struct hilg_state *state = NULL;
@@ -47,9 +46,9 @@ void hilg_run(struct hilg_state *state)
 		int col = 0;
 
 		game_info->update_board_func(game_info->game_state,
-									 state->board,
-									 game_info->row_count,
-									 game_info->col_count);
+					     state->board,
+					     game_info->row_count,
+					     game_info->col_count);
 
 		clear();
 
@@ -70,19 +69,22 @@ void hilg_run(struct hilg_state *state)
 			event.type = KEYPRESS;
 			event.data.keycode = keycode;
 
-			game_info->handle_event_func(game_info->game_state, &event);
+			game_info->handle_event_func(game_info->game_state,
+						     &event);
 		}
 
 		/* timer events */
 		if (game_info->timer_interval != 0) {
-			clock_t wait_limit = game_info->timer_interval * CLOCKS_PER_SEC;
+			clock_t wait_limit =
+				game_info->timer_interval * CLOCKS_PER_SEC;
 			clock_t current_time = clock();
 
 			if (current_time - previous_tick >= wait_limit) {
 				struct hilg_event event = {
 					.type = TIMER
 				};
-				game_info->handle_event_func(game_info->game_state, &event);
+				game_info->handle_event_func(game_info->game_state,
+							     &event);
 
 				/* reset timer */
 				previous_tick = current_time;

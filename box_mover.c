@@ -13,9 +13,9 @@ struct bmover_state {
 
 /* forward declarations */
 static void bmover_handle_event(void *state,
-								struct hilg_event *event);
+				struct hilg_event *event);
 static void bmover_update_board(void *state, char **board,
-								int row_count, int col_count);
+				int row_count, int col_count);
 static int bmover_is_done(void *state);
 
 
@@ -87,7 +87,7 @@ static void bmover_handle_event(void *gstate, struct hilg_event *event)
 		int new_col = state->current_col + delta_col;
 
 		if (new_row > 0 && new_row < state->row_count - 1 &&
-			new_col > 0 && new_col < state->col_count - 1) {
+		    new_col > 0 && new_col < state->col_count - 1) {
 
 			state->current_row = new_row;
 			state->current_col = new_col;
@@ -96,7 +96,7 @@ static void bmover_handle_event(void *gstate, struct hilg_event *event)
 }
 
 static void bmover_update_board(void *gstate, char **board,
-								int row_count, int col_count)
+				int row_count, int col_count)
 {
 	struct bmover_state *state = gstate;
 
@@ -107,11 +107,12 @@ static void bmover_update_board(void *gstate, char **board,
 		for (col = 0; col < col_count; col++) {
 			/* borders */
 			if (row == 0 || row == row_count - 1 ||
-				col == 0 || col == col_count - 1) {
+			    col == 0 || col == col_count - 1) {
 				board[row][col] = '*';
 			}
 			/* box */
-			else if (row == state->current_row && col == state->current_col) {
+			else if (row == state->current_row &&
+				 col == state->current_col) {
 				board[row][col] = '#';
 			}
 			/* empty space */
