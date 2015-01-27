@@ -20,9 +20,8 @@ static int bmover_is_done(void *state);
 
 
 /* main function */
-int main(int argc, char *argv[])
+int main(void)
 {
-	struct hilg_game_info game_info;
 	struct bmover_state game_state = {
 		.done = 0,
 		.current_row = 1,
@@ -31,10 +30,7 @@ int main(int argc, char *argv[])
 		.col_count = 10
 	};
 
-	(void) argc;
-	(void) argv;
-
-	game_info = (struct hilg_game_info) {
+	struct hilg_game_info game_info = {
 		.row_count = 10,
 		.col_count = 10,
 		.timer_interval = 0,
