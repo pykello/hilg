@@ -29,7 +29,6 @@ struct hilg_state * hilg_init(struct hilg_game_info *game_info)
 
 void hilg_run(struct hilg_state *state)
 {
-	bool done = false;
 	struct hilg_game_info *game_info = state->game_info;
 	clock_t previous_tick = 0;
 

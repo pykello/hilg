@@ -31,6 +31,9 @@ int main(int argc, char *argv[])
 		.col_count = 10
 	};
 
+	(void) argc;
+	(void) argv;
+
 	game_info = (struct hilg_game_info) {
 		.row_count = 10,
 		.col_count = 10,

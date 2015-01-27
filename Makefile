@@ -1,11 +1,22 @@
+TARGET_LIB = libhilg.so
 
-LDFLAGS=-lncurses
-CFLAGS=-I .
+CC = gcc
+CFLAGS = -I . -fPIC -Wall -Wextra -O2
+LIB_LDFLAGS = -shared
+LDFLAGS = -L . -Wl,-rpath=. -lncurses -lhilg
+RM = rm -f
 
-box_mover: hilg.o
+SRCS = hilg.c
+OBJS = $(SRCS:.c=.o)
 
-all: box_mover
+EXAMPLES = box_mover
 
+.PHONY: all
+all: ${TARGET_LIB} ${EXAMPLES}
+
+$(TARGET_LIB): $(OBJS)
+	$(CC) ${LIB_LDFLAGS} -o $@ $^
+
+.PHONY: clean
 clean:
-	rm -f hilg.o
-	rm -f box_mover
+	${RM} ${TARGET_LIB} ${OBJS} ${EXAMPLES}
