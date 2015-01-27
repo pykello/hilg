@@ -25,14 +25,6 @@ struct hilg_game_info {
 	int (*is_done_func)(void *);
 };
 
-struct hilg_state {
-	struct hilg_game_info *game_info;
-	char **board;
-};
-
-extern struct hilg_state * hilg_init(struct hilg_game_info *game_info);
-extern void hilg_run(struct hilg_state *state);
-
-#define hilg_init_and_run(game_info_ptr) hilg_run(hilg_init(game_info_ptr))
+extern void hilg_run(struct hilg_game_info *game_info);
 
 #endif

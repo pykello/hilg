@@ -40,7 +40,7 @@ int main(void)
 		.is_done_func = bmover_is_done
 	};
 
-	hilg_init_and_run(&game_info);
+	hilg_run(&game_info);
 
 	return 0;
 }
