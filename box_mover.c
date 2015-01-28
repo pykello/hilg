@@ -108,4 +108,3 @@ static int bmover_is_done(void *gstate)
 	struct bmover_state *state = gstate;
 	return state->done;
 }
-

@@ -9,7 +9,7 @@ RM = rm -f
 SRCS = hilg.c
 OBJS = $(SRCS:.c=.o)
 
-EXAMPLES = box_mover
+EXAMPLES = box_mover snake
 
 .PHONY: all
 all: ${TARGET_LIB} ${EXAMPLES}

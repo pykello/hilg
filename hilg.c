@@ -12,12 +12,12 @@ static void init_ncurses(void);
 static void draw_board(char **board, int row_count, int col_count);
 static void dispatch_keyboard_events(struct hilg_game_info *game_info);
 static void dispatch_timer_events(struct hilg_game_info *game_info,
-				  clock_t *previous_tick);
-
+				  struct timespec *previous_tick);
+static int diff_timespec_ms(struct timespec end, struct timespec begin);
 
 void hilg_run(struct hilg_game_info *game_info)
 {
-	clock_t previous_tick = 0;
+	struct timespec previous_tick = {0, 0};
 
 	int row_count = game_info->row_count;
 	int col_count = game_info->col_count;
@@ -106,18 +106,18 @@ static void dispatch_keyboard_events(struct hilg_game_info *game_info)
 }
 
 static void dispatch_timer_events(struct hilg_game_info *game_info,
-				  clock_t *previous_tick)
+				  struct timespec *previous_tick)
 {
-	clock_t wait_limit = 0;
-	clock_t current_time = 0;
+	struct timespec current_time = {0, 0};
+	int time_passed_ms = 0;
 
 	if (game_info->timer_interval == 0)
 		return;
 
-	wait_limit = (game_info->timer_interval * CLOCKS_PER_SEC) / 1000;
-	current_time = clock();
+	clock_gettime(CLOCK_REALTIME, &current_time);
 
-	if (current_time - *previous_tick >= wait_limit) {
+	time_passed_ms = diff_timespec_ms(current_time, *previous_tick);
+	if (time_passed_ms >= game_info->timer_interval) {
 		struct hilg_event event = {
 			.type = TIMER
 		};
@@ -127,4 +127,14 @@ static void dispatch_timer_events(struct hilg_game_info *game_info,
 		/* reset timer */
 		*previous_tick = current_time;
 	}
+}
+
+static int diff_timespec_ms(struct timespec end, struct timespec begin)
+{
+	int diff = 0;
+
+	diff += (end.tv_sec - begin.tv_sec) * 1000;
+	diff += (end.tv_nsec - begin.tv_nsec) / 1000000;
+
+	return diff;
 }
