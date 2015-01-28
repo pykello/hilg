@@ -1,11 +1,14 @@
 #include <hilg.h>
 #include <stdlib.h>
 
+#define CELL_BORDER '*'
+#define CELL_BOX '#'
+#define CELL_EMPTY ' '
+
 /* types */
 struct bmover_state {
 	int done;
-	int current_row;
-	int current_col;
+	struct hilg_cell current_cell;
 	int row_count;
 	int col_count;
 };
@@ -23,8 +26,7 @@ int main(void)
 {
 	struct bmover_state game_state = {
 		.done = 0,
-		.current_row = 1,
-		.current_col = 1,
+		.current_cell = {.row = 1, .col = 1},
 		.row_count = 10,
 		.col_count = 10
 	};
@@ -48,6 +50,7 @@ int main(void)
 static void bmover_handle_event(void *gstate, struct hilg_event *event)
 {
 	struct bmover_state *state = gstate;
+	struct hilg_cell target_cell = state->current_cell;
 
 	if (event->type != KEYPRESS)
 		return;
@@ -58,22 +61,21 @@ static void bmover_handle_event(void *gstate, struct hilg_event *event)
 		state->done = 1;
 		break;
 	case KEY_UP:
-		if (state->current_row > 1)
-			state->current_row--;
+		target_cell = cell_add(state->current_cell, DIRECTION_UP);
 		break;
 	case KEY_DOWN:
-		if (state->current_row < state->row_count - 2)
-			state->current_row++;
+		target_cell = cell_add(state->current_cell, DIRECTION_DOWN);
 		break;
 	case KEY_LEFT:
-		if (state->current_col > 1)
-			state->current_col--;
+		target_cell = cell_add(state->current_cell, DIRECTION_LEFT);
 		break;
 	case KEY_RIGHT:
-		if (state->current_col < state->col_count - 2)
-			state->current_col++;
+		target_cell = cell_add(state->current_cell, DIRECTION_RIGHT);
 		break;
 	}
+
+	if (!cell_on_border(target_cell, state->row_count, state->col_count))
+		state->current_cell = target_cell;
 }
 
 static void bmover_update_board(void *gstate, char **board,
@@ -86,19 +88,16 @@ static void bmover_update_board(void *gstate, char **board,
 
 	for (row = 0; row < row_count; row++)
 		for (col = 0; col < col_count; col++) {
-			/* borders */
-			if (row == 0 || row == row_count - 1 ||
-			    col == 0 || col == col_count - 1) {
-				board[row][col] = '*';
+			struct hilg_cell cell = {.row = row, .col = col};
+
+			if (cell_on_border(cell, row_count, col_count)) {
+				board[row][col] = CELL_BORDER;
 			}
-			/* box */
-			else if (row == state->current_row &&
-				 col == state->current_col) {
-				board[row][col] = '#';
+			else if (cell_equals(cell, state->current_cell)) {
+				board[row][col] = CELL_BOX;
 			}
-			/* empty space */
 			else {
-				board[row][col] = ' ';
+				board[row][col] = CELL_EMPTY;
 			}
 		}
 }
