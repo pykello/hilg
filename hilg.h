@@ -33,6 +33,11 @@ struct hilg_cell {
 	int col;
 };
 
+#define cell_equals(c1, c2) ((c1).row == (c2).row && (c1).col == (c2).col)
+#define cell_add(c1, c2) (struct hilg_cell) {(c1).row + (c2).row, (c1).col + (c2).col}
+#define cell_on_border(c, rows, cols) ((c).row == 0 || (c).col == 0 ||\
+				       (c).row == rows - 1 || (c).col == cols - 1)
+
 const struct hilg_cell DIRECTION_UP = {.row = -1, .col = 0};
 const struct hilg_cell DIRECTION_DOWN = {.row = 1, .col = 0};
 const struct hilg_cell DIRECTION_LEFT = {.row = 0, .col = -1};

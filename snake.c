@@ -19,16 +19,15 @@ struct snake_state {
 
 
 /* forward declarations */
+static void snake_update_board(void *state, char **board,
+			       int row_count, int col_count);
+static int snake_is_done(void *state);
 static void snake_handle_event(void *state, struct hilg_event *event);
 static void snake_handle_keypress_event(struct snake_state *state,
 					struct hilg_event *event);
 static void snake_handle_timer_event(struct snake_state *state);
 static void extend_snake(struct snake_state *state);
 static void generate_food(struct snake_state *state);
-static void snake_update_board(void *state, char **board,
-			       int row_count, int col_count);
-static int snake_is_done(void *state);
-
 
 /* main function */
 int main(void)
@@ -58,6 +57,46 @@ int main(void)
 	hilg_run(&game_info);
 
 	return 0;
+}
+
+static void snake_update_board(void *gstate, char **board,
+			       int row_count, int col_count)
+{
+	struct snake_state *state = gstate;
+	int row = 0;
+	int col = 0;
+	int cell_index = 0;
+
+	/* empty board */
+	for (row = 0; row < row_count; row++)
+		for (col = 0; col < col_count; col++)
+			board[row][col] = ' ';
+
+	/* draw borders */
+	for (row = 0; row < row_count; row++) {
+		board[row][0] = '#';
+		board[row][col_count - 1] = '#';
+	}
+
+	for (col = 0; col < col_count; col++) {
+		board[0][col] = '#';
+		board[row_count - 1][col] = '#';
+	}
+
+	/* draw snake */
+	for (cell_index = 0; cell_index < state->snake_len; cell_index++) {
+		struct hilg_cell cell = state->snake[cell_index];
+		board[cell.row][cell.col] = '*';
+	}
+
+	/* draw food */
+	board[state->food.row][state->food.col] = '@';
+}
+
+static int snake_is_done(void *gstate)
+{
+	struct snake_state *state = gstate;
+	return state->done;
 }
 
 static void snake_handle_event(void *gstate, struct hilg_event *event)
@@ -108,20 +147,13 @@ static void snake_handle_timer_event(struct snake_state *state)
 	for (cell_index = 0; cell_index < last_cell; cell_index++)
 		snake[cell_index] = snake[cell_index + 1];
 
-	snake[last_cell].row += state->direction.row;
-	snake[last_cell].col += state->direction.col;
+	snake[last_cell] = cell_add(snake[last_cell], state->direction);
 
-	/* game over ? */
-	if (snake[last_cell].row == 0 ||
-	    snake[last_cell].row == state->row_count - 1 ||
-	    snake[last_cell].col == 0 ||
-	    snake[last_cell].col == state->col_count - 1) {
+	if (cell_on_border(snake[last_cell], state->row_count, state->col_count))
 		state->done = 1;
-	}
 
 	/* food ? */
-	if (snake[last_cell].row == state->food.row &&
-	    snake[last_cell].col == state->food.col) {
+	if (cell_equals(snake[last_cell], state->food)) {
 		extend_snake(state);
 		generate_food(state);
 	}
@@ -138,9 +170,10 @@ static void extend_snake(struct snake_state *state)
 
 static void generate_food(struct snake_state *state)
 {
-	while (true) {
+	int collides_snake = 0;
+
+	do {
 		int cell_index = 0;
-		int collides_snake = 0;
 
 		state->food = (struct hilg_cell) {
 			.row = rand() % (state->row_count - 2) + 1,
@@ -148,51 +181,8 @@ static void generate_food(struct snake_state *state)
 		};
 
 		for (cell_index = 0; cell_index < state->snake_len; cell_index++)
-			if (state->food.row == state->snake[cell_index].row &&
-			    state->food.col == state->snake[cell_index].col)
+			if (cell_equals(state->food, state->snake[cell_index]))
 				collides_snake = 1;
 
-		if (!collides_snake)
-			break;
-	}
-}
-
-static void snake_update_board(void *gstate, char **board,
-			       int row_count, int col_count)
-{
-	struct snake_state *state = gstate;
-	int row = 0;
-	int col = 0;
-	int cell_index = 0;
-
-	/* empty board */
-	for (row = 0; row < row_count; row++)
-		for (col = 0; col < col_count; col++)
-			board[row][col] = ' ';
-
-	/* draw borders */
-	for (row = 0; row < row_count; row++) {
-		board[row][0] = '#';
-		board[row][col_count - 1] = '#';
-	}
-
-	for (col = 0; col < col_count; col++) {
-		board[0][col] = '#';
-		board[row_count - 1][col] = '#';
-	}
-
-	/* draw snake */
-	for (cell_index = 0; cell_index < state->snake_len; cell_index++) {
-		struct hilg_cell cell = state->snake[cell_index];
-		board[cell.row][cell.col] = '*';
-	}
-
-	/* draw food */
-	board[state->food.row][state->food.col] = '@';
-}
-
-static int snake_is_done(void *gstate)
-{
-	struct snake_state *state = gstate;
-	return state->done;
+	} while (collides_snake);
 }
