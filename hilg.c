@@ -48,7 +48,6 @@ static char ** allocate_board(int row_count, int col_count)
 	char **board = NULL;
 	int row = 0;
 
-	/* allocate board */
 	board = malloc(row_count * sizeof(char *));
 	for (row = 0; row < row_count; row++)
 		board[row] = malloc(col_count * sizeof(char));

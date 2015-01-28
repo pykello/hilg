@@ -1,5 +1,4 @@
 #include <hilg.h>
-#include <ncurses.h>
 #include <stdlib.h>
 
 /* types */

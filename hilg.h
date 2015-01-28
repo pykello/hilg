@@ -2,6 +2,9 @@
 #ifndef HILG_H
 #define HILG_H
 
+/* include ncurses for KEY_UP, etc. */
+#include <ncurses.h>
+
 enum event_type {
 	KEYPRESS,
 	TIMER
