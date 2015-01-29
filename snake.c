@@ -15,8 +15,8 @@ struct snake_state {
 	int col_count;
 	struct hilg_cell direction;
 	struct hilg_cell food;
+	struct hilg_key_queue key_queue;
 };
-
 
 /* forward declarations */
 static void snake_update_board(void *state, char **board,
@@ -41,7 +41,8 @@ int main(void)
 		.row_count = ROWS_MAX,
 		.col_count = COLS_MAX,
 		.direction = DIRECTION_RIGHT,
-		.food = {.row = ROWS_MAX / 2, .col = COLS_MAX / 2}
+		.food = {.row = ROWS_MAX / 2, .col = COLS_MAX / 2},
+		.key_queue = KEY_QUEUE_EMPTY
 	};
 
 	struct hilg_game_info game_info = {
@@ -123,16 +124,10 @@ static void snake_handle_keypress_event(struct snake_state *state,
 		state->done = 1;
 		break;
 	case KEY_UP:
-		state->direction = DIRECTION_UP;
-		break;
 	case KEY_DOWN:
-		state->direction = DIRECTION_DOWN;
-		break;
 	case KEY_LEFT:
-		state->direction = DIRECTION_LEFT;
-		break;
 	case KEY_RIGHT:
-		state->direction = DIRECTION_RIGHT;
+		queue_push(state->key_queue, event->data.keycode);
 		break;
 	}
 }
@@ -144,6 +139,20 @@ static void snake_handle_timer_event(struct snake_state *state)
 	int snake_len = state->snake_len;
 	int last_cell = snake_len - 1;
 
+	while (!queue_empty(state->key_queue)) {
+		struct hilg_cell new_direction;
+
+		int keycode = queue_peek(state->key_queue);
+		queue_pop(state->key_queue);
+
+		new_direction = key_to_direction(keycode);
+
+		if (!opposite_direction(state->direction, new_direction)) {
+			state->direction = new_direction;
+			break;
+		}
+	}
+
 	for (cell_index = 0; cell_index < last_cell; cell_index++)
 		snake[cell_index] = snake[cell_index + 1];
 
@@ -152,7 +161,6 @@ static void snake_handle_timer_event(struct snake_state *state)
 	if (cell_on_border(snake[last_cell], state->row_count, state->col_count))
 		state->done = 1;
 
-	/* food ? */
 	if (cell_equals(snake[last_cell], state->food)) {
 		extend_snake(state);
 		generate_food(state);
@@ -186,3 +194,4 @@ static void generate_food(struct snake_state *state)
 
 	} while (collides_snake);
 }
+

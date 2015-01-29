@@ -28,6 +28,8 @@ struct hilg_game_info {
 	int (*is_done_func)(void *);
 };
 
+/* cell definitions */
+
 struct hilg_cell {
 	int row;
 	int col;
@@ -42,6 +44,34 @@ const struct hilg_cell DIRECTION_UP = {.row = -1, .col = 0};
 const struct hilg_cell DIRECTION_DOWN = {.row = 1, .col = 0};
 const struct hilg_cell DIRECTION_LEFT = {.row = 0, .col = -1};
 const struct hilg_cell DIRECTION_RIGHT = {.row = 0, .col = 1};
+
+#define opposite_direction(a, b) ((a).row == -(b).row && (a).col == -(b).col)
+#define key_to_direction(k) ((k == KEY_UP) ? DIRECTION_UP : (\
+			     (k == KEY_DOWN) ? DIRECTION_DOWN : (\
+			     (k == KEY_LEFT) ? DIRECTION_LEFT : (\
+			     DIRECTION_RIGHT))))
+
+/* key queue definitions */
+
+#define KEY_QUEUE_SIZE_LIMIT 10
+
+struct hilg_key_queue {
+	int keycodes[KEY_QUEUE_SIZE_LIMIT];
+	int head;
+	int tail;
+};
+
+#define queue_next_head(q) (((q).head + 1) % KEY_QUEUE_SIZE_LIMIT)
+#define queue_next_tail(q) (((q).tail + 1) % KEY_QUEUE_SIZE_LIMIT)
+#define queue_empty(q) ((q).head == (q).tail)
+#define queue_full(q) (queue_next_head(q) == (q).tail)
+#define queue_push(q, v) ((q).keycodes[(q).head] = (v), (q).head = queue_next_head(q))
+#define queue_peek(q) ((q).keycodes[(q).tail])
+#define queue_pop(q) ((q).tail = queue_next_tail(q))
+
+const struct hilg_key_queue KEY_QUEUE_EMPTY = {.head = 0, .tail = 0};
+
+/* game loop function */
 
 extern void hilg_run(struct hilg_game_info *game_info);
 
