@@ -50,7 +50,6 @@ int main(void)
 static void bmover_handle_event(void *gstate, struct hilg_event *event)
 {
 	struct bmover_state *state = gstate;
-	struct hilg_cell target_cell = state->current_cell;
 
 	if (event->type != KEYPRESS)
 		return;
@@ -60,22 +59,21 @@ static void bmover_handle_event(void *gstate, struct hilg_event *event)
 	case 'q':
 		state->done = 1;
 		break;
+
 	case KEY_UP:
-		target_cell = cell_add(state->current_cell, DIRECTION_UP);
-		break;
 	case KEY_DOWN:
-		target_cell = cell_add(state->current_cell, DIRECTION_DOWN);
-		break;
 	case KEY_LEFT:
-		target_cell = cell_add(state->current_cell, DIRECTION_LEFT);
-		break;
 	case KEY_RIGHT:
-		target_cell = cell_add(state->current_cell, DIRECTION_RIGHT);
+	{
+		struct hilg_cell direction = key_to_direction(event->data.keycode);
+		struct hilg_cell target_cell = cell_add(state->current_cell, direction);
+
+		if (!cell_on_border(target_cell, state->row_count, state->col_count))
+			state->current_cell = target_cell;
+
 		break;
 	}
-
-	if (!cell_on_border(target_cell, state->row_count, state->col_count))
-		state->current_cell = target_cell;
+	}
 }
 
 static void bmover_update_board(void *gstate, char **board,
