@@ -101,3 +101,47 @@ int is_done(void *gstate)
 
 This function receives as the first argument the ```.game_state``` that you passed as part of ```game_info```,
 and returns 1 if is game is finished, and 0 otherwise.
+
+## Tutorials?
+If you are looking for a tutorial, we recommend that you study the source code of the examples that come with hilg:
+* [box mover](box_mover.c)
+* [snake](snake.c)
+
+## Utility types, macros, etc.
+
+**struct hilg_cell** can be used to represent a cell in a 2d grid, or a 2d direction. To define and initialize
+a ```hilg_cell``, you can do:
+
+```C
+struct hilg_cell some_cell = {.row = 1, .col = 1};
+```
+
+hilg comes with a few constants of type ```hilg_cell```:
+
+```C
+const struct hilg_cell DIRECTION_UP = {.row = -1, .col = 0};
+const struct hilg_cell DIRECTION_DOWN = {.row = 1, .col = 0};
+const struct hilg_cell DIRECTION_LEFT = {.row = 0, .col = -1};
+const struct hilg_cell DIRECTION_RIGHT = {.row = 0, .col = 1};
+```
+
+and a few useful macros:
+
+* ```cell_equals(c1, c2)``` which tells if c1 is equal to c2,
+* ```cell_add(c1, c2)``` which adds the two cells together. This is most useful when c2 represents a direction.
+* ```cell_on_border(c, rows, cols)``` which tells if c is on border of a rows*cols grid or not.
+* ```opposite_direction(c1, c2)``` which tells if c1 and c2 are opposite directions.
+* ```key_to_direction(k)``` which converts ```KEY_UP```, ```KEY_DOWN```, ```KEY_LEFT```, and ```KEY_RIGHT``` to the
+  corresponding direction values.
+ 
+**struct hilg_key_queue** can be used if you need to keep a queue of keycodes. You can initialize it with
+the constant ```KEY_QUEUE_EMPTY```.
+
+It also comes with the operations of a standard queue:
+* ```queue_empty(q)```
+* ```queue_full(q)```
+* ```queue_push(q, keycode)```
+* ```queue_peek(q)```
+* ```queue_pop(q)```
+
+
