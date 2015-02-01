@@ -2,15 +2,10 @@
 
 hilg is game engine which makes development & testing of the games which can be represented as grids extremely easy.
 
-## The Philosophy
+## Philosophy
 
 When beginners want to create games in C, dealing with how to do input and output might be too confusing for them.
 Hilg handles the game input/output, and all it requires from the programmer is to implement the game logic.
-We beleive this separation has several benefits:
-
-* Makes developing simple games extremely easy for absolute beginner C programmers,
-* Makes automated testing of these games very easy,
-* ...
 
 ## Installing and Running Examples
 
@@ -21,23 +16,27 @@ hilg requires ncurses to compile and run:
 sudo yum install ncurses-devel
 ```
 
-Now, you can compile the library and the examples by running make:
+Now, you can compile and install the library:
 
 ```
+./autogen.sh
+./configure
 make
+sudo make install
+sudo ldconfig
 ```
 
 Currently hilg comes with two examples. To run them:
 
 ```
 # Run the box mover example
-./bin/box_mover
+hilg_box_mover
 
 # Run the snake example
-./bin/snake
+hilg_snake
 ```
 
-## The Interface
+## Interface
 To create a game in hilg, you need to fill-in a ```hilg_game_info``` structure, and pass it to the ```hilg_run()``` function:
 
 ```C
