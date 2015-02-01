@@ -31,10 +31,10 @@ Currently hilg comes with two examples. To run them:
 
 ```
 # Run the box mover example
-./box_mover
+./bin/box_mover
 
 # Run the snake example
-./snake
+./bin/snake
 ```
 
 ## The Interface
@@ -104,8 +104,8 @@ and returns 1 if is game is finished, and 0 otherwise.
 
 ## Tutorials?
 If you are looking for a tutorial, we recommend that you study the source code of the examples that come with hilg:
-* [box mover](box_mover.c)
-* [snake](snake.c)
+* [box mover](examples/box_mover.c)
+* [snake](examples/snake.c)
 
 ## Utility types, macros, etc.
 
