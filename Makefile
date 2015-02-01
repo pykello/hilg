@@ -1,22 +1,28 @@
+# names and paths
 TARGET_LIB = libhilg.so
+SRC_DIR = src
+OBJS = $(SRC_DIR)/hilg.o
+BIN_DIR = bin
+EXAMPLES = $(BIN_DIR)/box_mover $(BIN_DIR)/snake
 
+# tools and flags
 CC = gcc
-CFLAGS = -I . -fPIC -Wall -Wextra -O2
-LIB_LDFLAGS = -shared
+CFLAGS = -I ./include -fPIC -Wall -Wextra -O2
 LDFLAGS = -L . -Wl,-rpath=. -lncurses -lhilg
 RM = rm -f
 
-SRCS = hilg.c
-OBJS = $(SRCS:.c=.o)
-
-EXAMPLES = box_mover snake
+# rules
+$(BIN_DIR)/%: examples/%.c
+	mkdir -p bin
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 .PHONY: all
 all: ${TARGET_LIB} ${EXAMPLES}
 
 $(TARGET_LIB): $(OBJS)
-	$(CC) ${LIB_LDFLAGS} -o $@ $^
+	$(CC) -shared -o $@ $^
 
 .PHONY: clean
 clean:
 	${RM} ${TARGET_LIB} ${OBJS} ${EXAMPLES}
+	${RM} -r $(BIN_DIR)
