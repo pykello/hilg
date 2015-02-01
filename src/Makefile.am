@@ -1,0 +1,6 @@
+libhilg_common_cflags = -I$(top_srcdir)/include \
+			-Wall -W -Wno-unused-parameter -Wno-pointer-sign
+
+lib_LTLIBRARIES = libhilg.la
+libhilg_la_SOURCES = hilg.c
+libhilg_la_CFLAGS = $(libhilg_common_cflags)
