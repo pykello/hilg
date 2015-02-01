@@ -79,8 +79,6 @@ static void draw_board(char **board, int row_count, int col_count)
 	int row = 0;
 	int col = 0;
 
-	clear();
-
 	for (row = 0; row < row_count; row++)
 		for (col = 0; col < col_count; col++)
 			mvprintw(row, col, "%c", board[row][col]);

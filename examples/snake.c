@@ -170,6 +170,10 @@ static void snake_handle_timer_event(struct snake_state *state)
 static void extend_snake(struct snake_state *state)
 {
 	int cell_index = 0;
+
+	if (state->snake_len == SNAKE_LEN_MAX)
+		return;
+
 	state->snake_len += 1;
 
 	for (cell_index = state->snake_len - 1; cell_index > 0; cell_index--)
@@ -188,6 +192,7 @@ static void generate_food(struct snake_state *state)
 			.col = rand() % (state->col_count - 2) + 1
 		};
 
+		collides_snake = 0;
 		for (cell_index = 0; cell_index < state->snake_len; cell_index++)
 			if (cell_equals(state->food, state->snake[cell_index]))
 				collides_snake = 1;
