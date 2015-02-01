@@ -4,3 +4,5 @@ libhilg_common_cflags = -I$(top_srcdir)/include \
 lib_LTLIBRARIES = libhilg.la
 libhilg_la_SOURCES = hilg.c
 libhilg_la_CFLAGS = $(libhilg_common_cflags)
+
+include_HEADERS = $(top_srcdir)/include/hilg.h
