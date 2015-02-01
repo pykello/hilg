@@ -46,6 +46,7 @@ int main(void)
 	};
 
 	struct hilg_game_info game_info = {
+		.title = "Snake",
 		.row_count = game_state.row_count,
 		.col_count = game_state.col_count,
 		.timer_interval = TIMER_INTERVAL,

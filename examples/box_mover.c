@@ -27,13 +27,14 @@ int main(void)
 	struct bmover_state game_state = {
 		.done = 0,
 		.current_cell = {.row = 1, .col = 1},
-		.row_count = 10,
-		.col_count = 10
+		.row_count = 15,
+		.col_count = 15
 	};
 
 	struct hilg_game_info game_info = {
-		.row_count = 10,
-		.col_count = 10,
+		.title = "Box Mover",
+		.row_count = 15,
+		.col_count = 15,
 		.timer_interval = 0,
 		.game_state = &game_state,
 		.handle_event_func = bmover_handle_event,
