@@ -30,10 +30,10 @@ Currently hilg comes with two examples. To run them:
 
 ```
 # Run the box mover example
-hilg_box_mover
+box_mover_ncurses
 
 # Run the snake example
-hilg_snake
+snake_ncurses
 ```
 
 ## Interface
