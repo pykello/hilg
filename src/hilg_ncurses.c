@@ -10,10 +10,12 @@
 static char ** allocate_board(int row_count, int col_count);
 static void free_board(char **board, int row_count);
 static void init_ncurses(void);
-static WINDOW * create_game_window(struct hilg_game_info *game_info);
-static void draw_board(WINDOW *window, struct hilg_game_info *game_info,
-		       char **board);
-static void dispatch_keyboard_events(struct hilg_game_info *game_info);
+static WINDOW * create_main_window(struct hilg_game_info *game_info);
+static WINDOW * create_board_window(struct hilg_game_info *game_info);
+static void draw_board(WINDOW *window, char **board,
+		       int row_count, int col_count);
+static void dispatch_keyboard_events(WINDOW *board_window,
+				     struct hilg_game_info *game_info);
 static void dispatch_timer_events(struct hilg_game_info *game_info,
 				  struct timespec *previous_tick);
 static int diff_timespec_ms(struct timespec end, struct timespec begin);
@@ -21,30 +23,34 @@ static int diff_timespec_ms(struct timespec end, struct timespec begin);
 void hilg_run(struct hilg_game_info *game_info)
 {
 	struct timespec previous_tick = {0, 0};
-	WINDOW *window = NULL;
+	WINDOW *main_window = NULL;
+	WINDOW *board_window = NULL;
 
 	int row_count = game_info->row_count;
 	int col_count = game_info->col_count;
 	char **board = allocate_board(row_count, col_count);
 
 	init_ncurses();
-	window = create_game_window(game_info);
+	main_window = create_main_window(game_info);
+	board_window = create_board_window(game_info);
 
 	while (!game_info->is_done_func(game_info->game_state))
 	{
 		game_info->update_board_func(game_info->game_state,
 					     board, row_count, col_count);
 
-		draw_board(window, game_info, board);
 
-		dispatch_keyboard_events(game_info);
+		draw_board(board_window, board, row_count, col_count);
+
+		dispatch_keyboard_events(board_window, game_info);
 		dispatch_timer_events(game_info, &previous_tick);
 
 		/* avoid 100% cpu */
 		usleep(1000);
 	}
 
-	delwin(window);
+	delwin(board_window);
+	delwin(main_window);
 	endwin();
 	free_board(board, row_count);
 }
@@ -80,52 +86,70 @@ static void init_ncurses(void)
 	keypad(stdscr, TRUE);	
 }
 
-static WINDOW * create_game_window(struct hilg_game_info *game_info)
+static WINDOW * create_main_window(struct hilg_game_info *game_info)
 {
 	WINDOW *window = NULL;
+	int title_col = 0;
 
-	/* reserve two rows and two columns for borders */
-	int row_count = game_info->row_count + 4;
-	int col_count = game_info->col_count + 2;
+	int game_row_count = game_info->row_count;
+	int game_col_count = game_info->col_count;
 
-	window = newwin(row_count, col_count, 0, 0);
+	/*
+	 * 2 rows for borders + 1 row for title + 1 row for title separator,
+	 * 2 cols for borders.
+	 */
+	int win_row_count = game_row_count + 4;
+	int win_col_count = game_col_count + 2;
+	window = newwin(win_row_count, win_col_count, 0, 0);
+
+	/* draw borders and title separator */
+	box(window, 0, 0);
+	mvwhline(window, 2, 1, 0, game_col_count);
+	mvwaddch(window, 2, 0, ACS_LTEE);
+	mvwaddch(window, 2, game_col_count + 1, ACS_RTEE);
+
+	/* write game info */
+	title_col = 1 + (game_col_count - strlen(game_info->title)) / 2;
+	mvwprintw(window, 1, title_col, "%s", game_info->title);
+
+	wrefresh(window);
+
 	return window;
 }
 
-static void draw_board(WINDOW *window, struct hilg_game_info *game_info,
-		       char **board)
+static WINDOW * create_board_window(struct hilg_game_info *game_info)
+{
+	WINDOW *window = NULL;
+
+	window = newwin(game_info->row_count, game_info->col_count, 3, 1);
+
+	/* set input options */
+	wtimeout(window, 0);
+	keypad(window, TRUE);
+
+	return window;
+}
+
+static void draw_board(WINDOW *window, char **board,
+		       int row_count, int col_count)
 {
 	int row = 0;
 	int col = 0;
-	int title_col = 0;
 
-	int row_count = game_info->row_count;
-	int col_count = game_info->col_count;
-
-	/* draw borders */
-	box(window, 0, 0);
-	mvwhline(window, 2, 1, 0, row_count);
-	mvwaddch(window, 2, 0, ACS_LTEE);
-	mvwaddch(window, 2, col_count + 1, ACS_RTEE);
-
-	/* draw game board */
 	for (row = 0; row < row_count; row++)
 		for (col = 0; col < col_count; col++)
-			mvwaddch(window, row + 3, col + 1, board[row][col]);
-
-	/* write game info */
-	title_col = 1 + (col_count - strlen(game_info->title)) / 2;
-	mvwprintw(window, 1, title_col, "%s", game_info->title);
+			mvwaddch(window, row, col, board[row][col]);
 
 	wrefresh(window);
 }
 
-static void dispatch_keyboard_events(struct hilg_game_info *game_info)
+static void dispatch_keyboard_events(WINDOW *board_window,
+				     struct hilg_game_info *game_info)
 {
 	while (true) {
 		struct hilg_event event;
 
-		int keycode = getch();
+		int keycode = wgetch(board_window);
 		if (keycode == ERR)
 			break;
 
