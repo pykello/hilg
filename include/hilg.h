@@ -25,10 +25,13 @@ struct hilg_game_info {
 	int timer_interval;
 	void *game_state;
 	char title[TITLE_LEN_MAX + 1];
+	int sidebar_fields;
+	int sidebar_length;
 
 	void (*handle_event_func)(void *, struct hilg_event *);
 	void (*update_board_func)(void *, char **, int, int);
 	int (*is_done_func)(void *);
+	void (*update_sidebar_func)(void *, int, char *);
 };
 
 /* cell definitions */

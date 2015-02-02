@@ -13,6 +13,7 @@ struct snake_state {
 	int snake_len;
 	int row_count;
 	int col_count;
+	int score;
 	struct hilg_cell direction;
 	struct hilg_cell food;
 	struct hilg_key_queue key_queue;
@@ -21,6 +22,7 @@ struct snake_state {
 /* forward declarations */
 static void snake_update_board(void *state, char **board,
 			       int row_count, int col_count);
+static void snake_update_sidebar(void *state, int id, char *field_str);
 static int snake_is_done(void *state);
 static void snake_handle_event(void *state, struct hilg_event *event);
 static void snake_handle_keypress_event(struct snake_state *state,
@@ -50,10 +52,13 @@ int main(void)
 		.row_count = game_state.row_count,
 		.col_count = game_state.col_count,
 		.timer_interval = TIMER_INTERVAL,
+		.sidebar_fields = 1,
+		.sidebar_length = 10,
 		.game_state = &game_state,
 		.handle_event_func = snake_handle_event,
 		.update_board_func = snake_update_board,
-		.is_done_func = snake_is_done
+		.is_done_func = snake_is_done,
+		.update_sidebar_func = snake_update_sidebar
 	};
 
 	hilg_run(&game_info);
@@ -93,6 +98,12 @@ static void snake_update_board(void *gstate, char **board,
 
 	/* draw food */
 	board[state->food.row][state->food.col] = '@';
+}
+
+static void snake_update_sidebar(void *gstate, int id, char *field_str)
+{
+	struct snake_state *state = gstate;
+	sprintf(field_str, "score: %d", state->score);
 }
 
 static int snake_is_done(void *gstate)
@@ -165,6 +176,7 @@ static void snake_handle_timer_event(struct snake_state *state)
 	if (cell_equals(snake[last_cell], state->food)) {
 		extend_snake(state);
 		generate_food(state);
+		state->score += 1;
 	}
 }
 
