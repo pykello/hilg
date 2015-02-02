@@ -21,6 +21,7 @@ AC_PROG_CC
 
 # Checks for libraries.
 AC_CHECK_LIB([ncurses], [initscr])
+AC_CHECK_LIB([SDL2], [SDL_Init])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
