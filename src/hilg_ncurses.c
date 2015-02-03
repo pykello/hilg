@@ -49,6 +49,8 @@ void hilg_run(struct hilg_game_info *game_info)
 		dispatch_keyboard_events(board_window, game_info);
 		dispatch_timer_events(game_info, &previous_tick);
 
+		doupdate();
+
 		/* avoid 100% cpu */
 		usleep(5000);
 	}
@@ -165,7 +167,7 @@ static void draw_board(WINDOW *window, char **board,
 		for (col = 0; col < col_count; col++)
 			mvwaddch(window, row, col, board[row][col]);
 
-	wrefresh(window);
+	wnoutrefresh(window);
 }
 
 static void update_sidebar(WINDOW *window, struct hilg_game_info *game_info)
@@ -177,7 +179,7 @@ static void update_sidebar(WINDOW *window, struct hilg_game_info *game_info)
 		return;
 
 	field_text = malloc(game_info->sidebar_length + 1);
-	wclear(window);
+	werase(window);
 
 	for (field = 0; field < game_info->sidebar_fields; field++) {
 		game_info->update_sidebar_func(game_info->game_state,
@@ -185,7 +187,7 @@ static void update_sidebar(WINDOW *window, struct hilg_game_info *game_info)
 		mvwprintw(window, field, 0, field_text);
 	}
 
-	wrefresh(window);
+	wnoutrefresh(window);
 	free(field_text);
 }
 
