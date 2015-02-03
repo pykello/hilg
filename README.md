@@ -9,11 +9,12 @@ Hilg handles the game input/output, and all it requires from the programmer is t
 
 ## Installing and Running Examples
 
-hilg requires ncurses to compile and run:
+hilg requires autotools, ncurses, and SDL2 to compile and run:
 
 ```
 # Fedora, Redhat, CentOS
-sudo yum install ncurses-devel
+sudo yum install autoconf automake libtool
+sudo yum install ncurses-devel SDL2-devel
 ```
 
 Now, you can compile and install the library:
