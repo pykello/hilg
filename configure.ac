@@ -20,18 +20,19 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 
 # Checks for libraries.
-AC_CHECK_LIB([ncurses], [initscr])
-AC_CHECK_LIB([SDL2], [SDL_Init])
+AC_CHECK_LIB([ncurses], [initscr], [], [AC_MSG_ERROR([ncurses library not found])])
+AC_CHECK_LIB([SDL2], [SDL_Init], [], [AC_MSG_ERROR([SDL2 library not found])])
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h], [],
+		 [AC_MSG_ERROR([some required header files were not found])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([clock_gettime])
+AC_CHECK_FUNCS([clock_gettime], [], [AC_MSG_ERROR([clock_gettime not found])])
 
 AC_CONFIG_FILES([Makefile src/Makefile examples/Makefile])
 AC_OUTPUT
