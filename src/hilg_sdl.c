@@ -8,10 +8,19 @@
 
 #define DEFAULT_TILE_SIZE 48
 
+int color_map [][3] = {
+	[' '] = {0, 0, 0},
+	['#'] = {0, 128, 0},
+	['*'] = {128, 0, 0},
+	['@'] = {200, 200, 200}
+};
+
 /* forward declarations */
 static char ** allocate_board(int row_count, int col_count);
 static void free_board(char **board, int row_count);
 static SDL_Window * create_window(struct hilg_game_info *game_info);
+static void draw_board(SDL_Window *window, char **board,
+		       int row_count, int col_count);
 static void dispatch_keyboard_events(struct hilg_game_info *game_info);
 static void dispatch_timer_events(struct hilg_game_info *game_info,
 				  struct timespec *previous_tick);
@@ -37,7 +46,7 @@ void hilg_run(struct hilg_game_info *game_info)
 		game_info->update_board_func(game_info->game_state,
 					     board, row_count, col_count);
 
-		//draw_board(window, board, row_count, col_count);
+		draw_board(window, board, row_count, col_count);
 
 		dispatch_keyboard_events(game_info);
 		dispatch_timer_events(game_info, &previous_tick);
@@ -76,14 +85,43 @@ static SDL_Window * create_window(struct hilg_game_info *game_info)
 {
 	SDL_Window *window = NULL;
 
-	int width = game_info->col_count * DEFAULT_TILE_SIZE;
-	int height = game_info->row_count * DEFAULT_TILE_SIZE;
+	int width = game_info->col_count * DEFAULT_TILE_SIZE + 20;
+	int height = game_info->row_count * DEFAULT_TILE_SIZE + 20;
 
 	window = SDL_CreateWindow(game_info->title, SDL_WINDOWPOS_UNDEFINED,
 				  SDL_WINDOWPOS_UNDEFINED, width, height,
 				  SDL_WINDOW_OPENGL);
 
 	return window;
+}
+
+static void draw_board(SDL_Window *window, char **board,
+		       int row_count, int col_count)
+{
+	int row = 0;
+	int col = 0;
+
+	SDL_Surface *screen = SDL_GetWindowSurface(window);
+
+	for (row = 0; row < row_count; row++)
+		for (col = 0; col < col_count; col++) {
+			SDL_Rect rect = {
+				.x = col * DEFAULT_TILE_SIZE + 12,
+				.y = row * DEFAULT_TILE_SIZE + 12,
+				.w = DEFAULT_TILE_SIZE - 4,
+				.h = DEFAULT_TILE_SIZE - 4
+			};
+
+			int code = board[row][col];
+			int color = SDL_MapRGB(screen->format,
+					       color_map[code][0],
+					       color_map[code][1],
+					       color_map[code][2]);
+
+			SDL_FillRect(screen, &rect, color);
+		}
+
+	SDL_UpdateWindowSurface(window);
 }
 
 static void dispatch_keyboard_events(struct hilg_game_info *game_info)

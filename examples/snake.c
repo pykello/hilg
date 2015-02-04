@@ -2,9 +2,9 @@
 #include <stdlib.h>
 
 /* types and definitions */
-#define ROWS_MAX 20
-#define COLS_MAX 20
-#define SNAKE_LEN_MAX 20
+#define ROWS_MAX 15
+#define COLS_MAX 15
+#define SNAKE_LEN_MAX 30
 #define TIMER_INTERVAL 300
 
 struct snake_state {
