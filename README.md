@@ -32,10 +32,16 @@ Currently hilg comes with two examples. To run them:
 ```
 # Run the box mover example
 box_mover_ncurses
+box_mover_sdl
 
 # Run the snake example
 snake_ncurses
+snake_sdl
 ```
+
+![Screenshot](screenshot_ncurses.png)
+![Screenshot](screenshot_sdl.png)
+
 
 ## Interface
 To create a game in hilg, you need to fill-in a ```hilg_game_info``` structure, and pass it to the ```hilg_run()``` function:
